@@ -25,6 +25,7 @@ class Playlist:
         self.tracks = []
         for yt_track in yt_tracks:
             track = Track.from_dict(yt_track)
+            track.playlist_title = self.title   
             self.tracks.append(track)
 
     @classmethod
@@ -32,7 +33,10 @@ class Playlist:
         yt_user = ytmusic.get_user(CHANNEL_ID)
         yt_playlists = ytmusic.get_user_playlists(CHANNEL_ID, yt_user["playlists"]["params"])
 
-        yt_playlists = [yt_playlists[1]]
+        # HACK LE TEMPS DES TESTS
+        # mauvaise idée ici [yt_playlists[1]], je devrais l'enlever
+        yt_playlists = [yt_playlists[0]]
+
         for yt_playlist in yt_playlists:
 
             new_playlist = cls(

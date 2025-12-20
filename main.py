@@ -25,8 +25,10 @@ for playlist in Playlist.playlists:
     n = len(playlist.tracks)
     for i in range(n):
         for j in range(i + 1, n):
-            a = playlist.tracks[i]
-            b = playlist.tracks[j]
+            track1 = playlist.tracks[i]
+            track2 = playlist.tracks[j]
+
+            Track.is_duplicate(track1, track2)
             # track1 = Track(playlist["tracks"][0])
             # track2 = Track(playlist["tracks"][1])
             # Track.is_duplicate(track1, track2)
