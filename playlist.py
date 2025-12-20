@@ -35,7 +35,8 @@ class Playlist:
 
         # HACK LE TEMPS DES TESTS
         # mauvaise idée ici [yt_playlists[1]], je devrais l'enlever
-        yt_playlists = [yt_playlists[0]]
+        # mauvaise idée ici [yt_playlists[0]], je devrais l'enlever
+        # yt_playlists = [yt_playlists[2]]
 
         for yt_playlist in yt_playlists:
 
