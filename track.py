@@ -16,22 +16,26 @@ class Track:
 
         # some exceptions
         EXCEPTIONS = [
-            '(From "Saturday Night Fever" Soundtrack)'
-            "Play & Win Radio Edit"
+            '(From "Saturday Night Fever" Soundtrack)',
+            "Play & Win Radio Edit",
+            "(Play & Win Radio Version)",
+            "[Play & Win Radio Edit]",
             "(Radio Edit)",
             "(feat. Snoop Dogg)",
             "(feat. Kardinal Offishall)",
+            "(feat. Daft Punk)",
+            "| Sachafcb",
         ]
         for exception in EXCEPTIONS:
             title = title.replace(exception, "")
 
         clean_words = []
         for word in title.split(" "):
-            clean_word = word.lower()
-            clean_word = clean_word.replace("(", "")
-            clean_word = clean_word.replace(")", "")
-            clean_words.append(clean_word)
-
+            if word: # remove spaces
+                clean_word = word.lower()
+                clean_word = clean_word.replace("(", "")
+                clean_word = clean_word.replace(")", "")
+                clean_words.append(clean_word)
 
         return clean_words
 
@@ -46,11 +50,13 @@ class Track:
         artists = [artist["name"].lower() for artist in track["artists"]]
         return cls(title=title, artists=artists)
 
+    def _is_legitimate_duplicate(track1, track2):
+        pass 
+        
     def is_duplicate(track1, track2):
 
         artist_match = False
-        # TODO compare artist word by word
-        # return false if no match in artist
+        # first check if there is a match in artists
         for artist1 in track1.artists:
             for artist2 in track2.artists:
                 if artist1 == artist2:
@@ -65,10 +71,11 @@ class Track:
 
         # then compare words in song
 
+
         WORDS_TO_IGNORE = [
             "remasterisé", "remastered", "à", "a", "en", "pt.", "ne", "toi", "et", "que", "les",
             "le", "la", "of", "the", "in", "de", "il", "elle", "mon", "vie", "je", "version", "tous",
-            "feat.", "&", "all", "i", "remix", "remaster"
+            "feat.", "&", "all", "i", "remix", "remaster", "-", "tu",
         ]
         YEARS = [str(year) for year in range(1940, 2031)]
         NUMBERS = [str(number) for number in range(1, 200)]
@@ -89,7 +96,7 @@ class Track:
 
                 if (
                     count_match == 2 # at least 2 words in common
-                # or 1 for the small titles
+                    # or 1 for the small titles
                     or (count_match == 1 and ( len(track1.title_as_word) < 3 or len(track2.title_as_word) < 3))
                 ):
                     print("")
@@ -107,4 +114,11 @@ class Track:
         matching word = tourbillon
         >>>>>>>>Find a duplicate between Nostalgie => Le Tourbillon - vanessa paradis
         >>>>>>>>Find a duplicate between Nostalgie => Le tourbillon de la vie - vanessa paradis jeanne moreau
+
+        >>>>>>>>Find a duplicate between Divers 2025 => Slipping Away - moby
+>>>>>>>>Find a duplicate between Divers 2025 => Slipping Away (Crier la Vie) (feat. Mylène Farmer) - moby
+
+
+>>>>>>>>Find a duplicate between RFM => Bye Bye (Refugee Camp Band Remix) - ménélik
+>>>>>>>>Find a duplicate between RFM => Bye Bye (feat. Imane D.) - ménélik
         """
