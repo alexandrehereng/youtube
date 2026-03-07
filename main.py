@@ -6,7 +6,9 @@ Playlist.init_playlists()
 
 all_tracks = []
 for playlist in Playlist.playlists:
-    all_tracks.extend(playlist.tracks)
+    # On exclut la playlist 'Live' pour le calcul des doublons
+    if playlist.title.lower() != "live":
+        all_tracks.extend(playlist.tracks)
 
 # compare every tracks
 n = len(all_tracks)

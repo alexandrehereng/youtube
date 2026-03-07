@@ -7,6 +7,7 @@ from typing import List, Dict
 class Track:
     title: str
     artists: List[str]  # list of artist names already in lowercase
+    video_id: str = ""
     playlist_title: str = field(init=False) 
 
     @property
@@ -25,6 +26,11 @@ class Track:
             "(feat. Kardinal Offishall)",
             "(feat. Daft Punk)",
             "| Sachafcb",
+            "(feat. DJ Oriska)",
+            "(Video Edit)",
+            "(feat. Eden Martin)",
+            "(feat. Mod Martin) ",
+            "Theme - Ancient (Civilization 6 OST)",
         ]
         for exception in EXCEPTIONS:
             title = title.replace(exception, "")
@@ -48,12 +54,44 @@ class Track:
         """Constructeur alternatif depuis un dictionnaire"""
         title = track["title"]
         artists = [artist["name"].lower() for artist in track["artists"]]
-        return cls(title=title, artists=artists)
+        video_id = track.get("videoId", "")
+        return cls(title=title, artists=artists, video_id=video_id)
 
+    @staticmethod
     def _is_legitimate_duplicate(track1, track2):
-        pass 
+        # Known pairs that are false positives
+        LEGITIMATE_PAIRS = [
+            ("wati by night", "wati house"),
+            ("pour que tu m'aimes encore", "destin"),
+            ("bye bye (refugee camp band remix)", "bye bye (feat. imane d.)"),
+            ("slipping away", "crier la vie"),
+            ("le tourbillon", "tourbillon de la vie"),
+            ("the way i are", "onerepublic remix"),
+            ("Day 'N' Nite (Crookers Remix)", "Day 'N' Nite (Mobin Master Remix)"),
+            ("Ça m'énerve 2020", "Ça m'énerve (Radio Edit)"),
+            ("xxxx", "xxxxxxx"),
+            ("xxxx", "xxxxxxx"),
+            ("xxxx", "xxxxxxx"),
+            ("xxxx", "xxxxxxx"),
+
+        ]
+        LEGITIMATE_PAIRS = [(p1.lower(), p2.lower()) for p1, p2 in LEGITIMATE_PAIRS]
         
+        t1 = track1.title.lower()
+        t2 = track2.title.lower()
+
+        # Check if titles match exception pairs
+        for p1, p2 in LEGITIMATE_PAIRS:
+            if (p1 in t1 and p2 in t2) or (p2 in t1 and p1 in t2):
+                return True
+                
+        return False
+        
+    @staticmethod
     def is_duplicate(track1, track2):
+        # Ignore hardcoded legitimate pairs
+        if Track._is_legitimate_duplicate(track1, track2):
+            return False
 
         artist_match = False
         # first check if there is a match in artists
@@ -70,12 +108,10 @@ class Track:
             return False
 
         # then compare words in song
-
-
         WORDS_TO_IGNORE = [
             "remasterisé", "remastered", "à", "a", "en", "pt.", "ne", "toi", "et", "que", "les",
             "le", "la", "of", "the", "in", "de", "il", "elle", "mon", "vie", "je", "version", "tous",
-            "feat.", "&", "all", "i", "remix", "remaster", "-", "tu",
+            "feat.", "&", "all", "i", "remix", "remaster", "-", "tu", "you", "are", "love"
         ]
         YEARS = [str(year) for year in range(1940, 2031)]
         NUMBERS = [str(number) for number in range(1, 200)]
@@ -89,7 +125,6 @@ class Track:
                 # skip common words
                 if word1 in WORDS_TO_IGNORE or word2 in WORDS_TO_IGNORE:
                     continue
-
                 
                 if word1 == word2:
                     count_match = count_match + 1
@@ -101,8 +136,10 @@ class Track:
                 ):
                     print("")
                     print(f"matching word = {word1}")
-                    print(">>>>>>>>Find a duplicate between " + track1.full_title)
-                    print(">>>>>>>>Find a duplicate between " + track2.full_title)
+                    print(f">>>>>>>>Find a duplicate between {track1.full_title}")
+                    print(f"        🔗 https://www.youtube.com/watch?v={track1.video_id}")
+                    print(f">>>>>>>>Find a duplicate between {track2.full_title}")
+                    print(f"        🔗 https://www.youtube.com/watch?v={track2.video_id}")
                     # embed()
 
                     return True
@@ -121,4 +158,13 @@ class Track:
 
 >>>>>>>>Find a duplicate between RFM => Bye Bye (Refugee Camp Band Remix) - ménélik
 >>>>>>>>Find a duplicate between RFM => Bye Bye (feat. Imane D.) - ménélik
+=> Pour que tu m'aimes encore (Live à Paris 1995) - céline dion
+        🔗 https://www.youtube.com/watch?v=npcjJqJDMVw
+>>>>>>>>Find a duplicate between Live => Destin (Live à Paris 1995) - céline dion
+        🔗 https://www.youtube.com/watch?v=5kiQFjL2Ckw
+
+matching word = wati
+>>>>>>>>Find a duplicate between RAP FR => Wati by Night - sexion d'assaut
+        🔗 https://www.youtube.com/watch?v=JVh7ISjF70M
+>>>>>>>>Find a duplicate between RAP FR => Wati House - sexion d'assaut
         """
